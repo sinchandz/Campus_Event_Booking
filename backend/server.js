@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -29,12 +30,21 @@ app.get('/api/health', (req, res) => {
 
 // Serve frontend static files in production
 const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
-app.use(express.static(frontendBuildPath));
 
-// Catch-all: serve index.html for client-side routing (must be after API routes)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, 'index.html'));
-});
+if (fs.existsSync(frontendBuildPath)) {
+  app.use(express.static(frontendBuildPath));
+
+  // Catch-all: serve index.html for client-side routing (must be after API routes)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+} else {
+  console.warn('WARNING: Frontend build not found at', frontendBuildPath);
+  console.warn('Run "npm run build" from the project root to build the frontend.');
+  app.get('*', (req, res) => {
+    res.status(404).json({ message: 'Frontend not built. API is available at /api/*' });
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
