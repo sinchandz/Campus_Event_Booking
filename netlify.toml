@@ -1,12 +1,16 @@
 [build]
-  base = "frontend"
-  command = "npm run build"
-  publish = "dist"
+  command = "cd backend && npm install && cd ../frontend && npm install && npm run build"
+  publish = "frontend/dist"
+  functions = "netlify/functions"
 
-# Proxy API requests to Render backend (avoids CORS issues)
+[functions]
+  included_files = ["backend/**"]
+  node_bundler = "esbuild"
+
+# Proxy API requests to the serverless function
 [[redirects]]
   from = "/api/*"
-  to = "https://campus-event-booking.onrender.com/api/:splat"
+  to = "/.netlify/functions/api/api/:splat"
   status = 200
   force = true
 
