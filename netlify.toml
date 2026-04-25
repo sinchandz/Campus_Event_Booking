@@ -4,6 +4,7 @@
   functions = "netlify/functions"
 
 [functions]
+  external_node_modules = ["serverless-http", "express", "cors", "dotenv", "mongoose", "bcryptjs", "jsonwebtoken"]
   included_files = ["backend/**"]
   node_bundler = "esbuild"
 
